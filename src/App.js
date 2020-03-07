@@ -2,29 +2,23 @@ import React from 'react';
 import './App.css';
 import Header from './Header';
 import ToDoItem from './ToDoItem';
-import todoData from './todoData';
+import SubmitToDo from './SubmitToDo';
+import axios from 'axios';
 
-class App extends React.Component{
+class App extends React.Component {
 
   constructor() {
     super()
     this.state = {
       loading: false,
-      todos: todoData,
-      tasks: {},
-      character: {}
+      tasks: [],
     }
-    this.handleChange=this.handleChange.bind(this)
+    this.handleChange = this.handleChange.bind(this)
   }
 
-  // if i want to fetch data from an API this is the request I could use
-  // componentDidMount() {
-  //   fetch("https://swapi.co/api/people/1").then(response => response.json()).then(data => {this.setState({character: data})})
-  // }
-
-  componentDidMount() {
-    this.setState({loading: true})
-    fetch("http://localhost:3000/api/tasks/1")
+  callApiGet() {
+    this.setState({ loading: true })
+    fetch("http://localhost:3000/api/tasks")
       .then(response => response.json())
       .then(data => {
         this.setState({
@@ -34,52 +28,58 @@ class App extends React.Component{
       })
   }
 
+  DeleteTask = (id) => {
+    console.log(id)
+    axios.delete(`http://localhost:3000/api/tasks/${id}`)
+      .then(res => {
+        this.callApiGet();
+        console.log(res)
+        console.log(res.data)
+      })
+  }
+
+  AddTask = description => {
+    const task = {
+        desc: description,
+    }
+    axios.post('http://localhost:3000/api/tasks/', {task})
+      .then(res => {
+          this.callApiGet();
+          console.log(res)
+          console.log(res.data)
+      })
+  }
+
+  componentDidMount() {
+    this.callApiGet();
+  }
+
   handleChange(id) {
     this.setState(prevState => {
       const updatedTodos = prevState.todos.map(todo => {
-          if (todo.id === id) {
-              return {
-                ...todo,
-                completed: !todo.completed 
-              }
+        if (todo.id === id) {
+          return {
+            ...todo,
+            completed: !todo.completed
           }
-          return todo
+        }
+        return todo
       })
       return {
-          todos: updatedTodos
+        todos: updatedTodos
       }
     })
   }
 
-  
-
-  render(){
-    const ToDoItems = this.state.todos.map(item => <ToDoItem 
-                                                      key={item.id} 
-                                                      item={item} 
-                                                      handleChange={this.handleChange}
-                                                    />)
-
-    const text = this.state.loading ? "Loading" : this.state.tasks.desc
-
-    console.log("-----------------");
-    console.log(this.state.tasks);
-    console.log("-----------------");
-    return(
+  render() {
+    return (
       <div>
         <Header />
-
-        <div className="myList">
-          {/* <ToDoItem tasks={{description:"Clean dishes"}}/>
-          <ToDoItem tasks={{description:"Buy groceries"}}/>
-          <ToDoItem tasks={{description:"Make bed"}}/>
-          <ToDoItem tasks={{description:"Vacuum living room"}}/> */}
-
-          {ToDoItems}
-          <p>{text}</p>
-        </div>
-      </div> 
+        <ToDoItem tasks={this.state.tasks} deleteTask={this.DeleteTask} />
+        <SubmitToDo tasks={this.state.tasks} addTask={this.AddTask}/>
+      </div>
     )
+
   }
 }
 

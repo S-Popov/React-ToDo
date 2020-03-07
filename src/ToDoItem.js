@@ -1,25 +1,39 @@
 import React from 'react';
 
 const completedTaskStyle = {
-    color: "#cdcdcd",
-    textDecoration: "line-through"
+  color: "#cdcdcd",
+  textDecoration: "line-through"
 }
 
-const ToDoItem = (props) =>
-    <div className="todoItem">
-        <input 
-            type="checkbox" 
-            checked={props.item.completed}
-            onChange={() => props.handleChange(props.item.id)}
-        /> 
-        <p style={props.item.completed ? completedTaskStyle: null}> {props.item.text} </p>
-    </div>
+class ToDoItem extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      loading: false,
+      tasks: [],
+    }
 
-/* in case we have a prop which is null we might not want to show some hardcoded information
-    in such cases we can put the follwoing code in to the paragraph tag
-style={{display: props.task.description ? "block" : "none"}}
-or
-style={{display: !props.question && "none"}}
-*/
+  }
+
+
+  render() {
+    return (
+      <div>
+        {/* <div > className="myList" */}
+        <div>
+          <div>
+            {this.props.tasks.map(task => (
+              <div className="myList" style={{ display: "flex" }}>
+                <input type="checkbox" checked={task.completed} />
+                <p style={task.completed ? completedTaskStyle : null}> {task.desc} </p>
+                <button type="button" onClick={() => this.props.deleteTask(task.id)}>Delete</button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
+}
 
 export default ToDoItem;
