@@ -1,2 +1,9 @@
 # React-ToDo
-To Do list of task react application making use of API
+
+## Description
+
+To Do list of task React application making use of ExpressJS API
+
+## Starting the application
+
+```$ npm start```
